@@ -1,0 +1,1 @@
+export type ErrorDto = null | { message: string, status: number };

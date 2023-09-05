@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["extendedWhereUnique"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Item {
+  id          String     @id @default(cuid()) @map("_id")
+  name        String
+  slug        String     @unique
+  description String
+  thumbnail   String
+  price       Int
+  qty         Int
+  cartItems   CartItem[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Coupon {
+  id          String   @id @default(cuid()) @map("_id")
+  name        String
+  code        String   @unique
+  description String
+  discount    Int
+  carts       Cart[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Cart {
+  id        String     @id @default(cuid()) @map("_id")
+  userId    String     @unique
+  cartItems CartItem[]
+  couponId  String?
+  coupon    Coupon?    @relation(fields: [couponId], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(cuid()) @map("_id")
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  itemId    String
+  item      Item     @relation(fields: [itemId], references: [id])
+  qty       Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
